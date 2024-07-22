@@ -33,7 +33,7 @@ export const BookList = () => {
     },
   ];
   return (
-    <div className="flex flex-wrap gap-20 justify-between h-auto  p-20 shadow-[0_5px_30px_0_rgba(0,0,0,0.2)] mt-20 mb-20">
+    <div className="flex flex-wrap gap-20 justify-between h-auto  p-20 shadow-[0_5px_30px_0_rgba(0,0,0,0.2)] md:mt-20 mb-20">
       {BOOKS.map((book) => (
         <BookItem key={book.id} book={book} />
       ))}

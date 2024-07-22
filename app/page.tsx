@@ -6,7 +6,7 @@ export default function Home() {
   return (
     <div className="">
       <Header />
-      <div className="flex  bg-slate-100">
+      <div className="md:flex bg-slate-100">
         <Sidebar />
         <BookList />
       </div>

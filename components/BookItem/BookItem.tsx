@@ -12,10 +12,12 @@ type BookItemProp = {
 
 export const BookItem: React.FC<BookItemProp> = ({ book }) => {
   return (
-    <div className=" flex gap-7 items-center w-[40%]">
-      <Image src={book.img} alt="img" width={150} height={150} />
-      <div className="flex flex-col justify-between   gap-2 h-[100%] ">
-        <p className={`text-2xl font-bold ${rubik.className}`}>{book.title}</p>
+    <div className=" md:flex gap-7 items-center xl:w-[40%] ">
+      <Image src={book.img} alt="img" width={200} height={200} />
+      <div className="flex flex-col justify-between gap-2 xl:h-[100%] ">
+        <p className={`md:text-2xl font-bold ${rubik.className}`}>
+          {book.title}
+        </p>
         <span>{book.author}</span>
         <span>1232.323 votes</span>
         <p>{book.text}</p>
