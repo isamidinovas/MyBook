@@ -1,20 +1,15 @@
-import Link from "next/link";
+import BookList from "@/components/BooksList/BooksList";
+import Header from "@/components/Header/Header";
+import Sidebar from "@/components/SideBar/SideBar";
 
 export default function Home() {
   return (
-    <div>
-      <ul>
-        <li>
-          <Link href="/">Explorer</Link>
-        </li>
-        <li>
-          <Link href="/shop">Shop</Link>
-        </li>
-        <li>
-          <Link href="/blog">Blog</Link>
-        </li>
-      </ul>
-      <h1>Home page</h1>
+    <div className="">
+      <Header />
+      <div className="flex  bg-slate-100">
+        <Sidebar />
+        <BookList />
+      </div>
     </div>
   );
 }
