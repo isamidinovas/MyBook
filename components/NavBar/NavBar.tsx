@@ -31,7 +31,7 @@ export const NavBar = () => {
         {/* Вертикальная линия */}
         <Image src={ShopIcon} alt="Logo" />
       </div>
-      <ul className="gap-20 font-medium items-center lg:flex hidden ">
+      <ul className="gap-20 font-medium items-center lg:flex hidden text-white">
         <li>
           <Link href="/">Explorer</Link>
         </li>
