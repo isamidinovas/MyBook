@@ -13,7 +13,7 @@ const buttonVariants = cva(
         destructive:
           "bg-destructive text-destructive-foreground hover:bg-destructive/90",
         outline:
-          "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
+          "border border-input bg-background hover:bg-yellow hover:text-accent-foreground",
         secondary:
           "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
@@ -32,7 +32,13 @@ const buttonVariants = cva(
       textColor: {
         black: "text-black",
         white: "text-white",
-        red: "text-red",
+        yellow: "text-yellow",
+      },
+      borderColor: {
+        yellow: "border-yellow",
+      },
+      backgroundColor: {
+        amber: "bg-amber",
       },
     },
     defaultVariants: {
@@ -55,6 +61,8 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       variant,
       size,
       borderRadius,
+      backgroundColor,
+      borderColor,
       textColor,
       asChild = false,
       ...props
@@ -65,7 +73,15 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     return (
       <Comp
         className={cn(
-          buttonVariants({ variant, size, borderRadius, textColor, className })
+          buttonVariants({
+            variant,
+            size,
+            borderRadius,
+            borderColor,
+            backgroundColor,
+            textColor,
+            className,
+          })
         )}
         ref={ref}
         {...props}
