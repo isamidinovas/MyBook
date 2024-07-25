@@ -23,7 +23,7 @@ const config = {
       },
       colors: {
         yellow: "#f59e0b",
-        amber: "#fef3c7",
+        amber: "##fef3c7",
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
