@@ -13,24 +13,45 @@ type BookItemProp = {
 };
 
 export const BookItem: React.FC<BookItemProp> = ({ book, isShopPage }) => {
+  const { authors, description, imageLinks } = book.volumeInfo;
+
+  const maxLength = 100;
+  const truncatedText =
+    description?.length > maxLength
+      ? description.slice(0, maxLength)
+      : description;
+
   return (
     <>
       <div
-        className="md:flex gap-7 items-center xl:w-[40%]"
+        className="md:flex gap-7 items-start xl:w-[45%] h-auto "
         style={{
           backgroundColor: isShopPage ? "white" : "transparent",
           padding: isShopPage ? "30px" : "0",
           borderRadius: isShopPage ? "10px" : "0",
         }}
       >
-        <Image src={book.img} alt="img" width={200} height={200} />
-        <div className="flex flex-col justify-between gap-2 xl:h-[100%] ">
-          <p className={`md:text-xl font-bold ${rubik.className}`}>
-            {book.title}
+        <div flex-shrink-0>
+          {imageLinks ? (
+            <Image
+              src={imageLinks?.smallThumbnail}
+              alt="img"
+              width={300}
+              height={400}
+            />
+          ) : (
+            <div className="w-[200px] h-[300px] bg-gray-200 flex items-center justify-center"></div>
+          )}
+        </div>
+        <div className="flex flex-col justify-between w-full gap-5">
+          <p className={`md:text-2xl font-bold ${rubik.className}`}>
+            {book.volumeInfo.title}
           </p>
-          <span>{book.author}</span>
-          <span>1232.323 votes</span>
-          <p>{book.text}</p>
+          {Array.isArray(authors) ? authors.join(" , ") : <p>{authors}</p>}
+          <span>
+            {book.volumeInfo.categories ? book.volumeInfo.categories : "s"}
+          </span>
+          <p className="opacity-50 ">{truncatedText}</p>
           {isShopPage && (
             <Button
               variant="outline"

@@ -1,7 +1,13 @@
 export type IBook = {
-  img: string;
   id: string;
-  title: string;
-  author: string;
-  text: string;
+  volumeInfo: {
+    title: string;
+    authors: string[] | string;
+    imageLinks: {
+      smallThumbnail: string;
+      thumbnail: string;
+    };
+    description: string;
+    categories: string;
+  };
 };
