@@ -48,9 +48,7 @@ export const BookItem: React.FC<BookItemProp> = ({ book, isShopPage }) => {
             {book.volumeInfo.title}
           </p>
           {Array.isArray(authors) ? authors.join(" , ") : <p>{authors}</p>}
-          <span>
-            {book.volumeInfo.categories ? book.volumeInfo.categories : "s"}
-          </span>
+          <span>{book.volumeInfo.categories}</span>
           <p className="opacity-50 ">{truncatedText}</p>
           {isShopPage && (
             <Button

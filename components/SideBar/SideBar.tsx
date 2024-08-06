@@ -1,3 +1,4 @@
+import { categories, ICategory } from "@/constants/categories";
 import {
   Select,
   SelectContent,
@@ -5,29 +6,42 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../UI/select";
+import { useState } from "react";
 
-export const Sidebar = () => {
+type SideBarProp = {
+  category: string;
+  setCategory: React.Dispatch<React.SetStateAction<string>>;
+};
+
+export const Sidebar: React.FC<SideBarProp> = ({ category, setCategory }) => {
+  console.log(category);
+
   return (
     <>
       <div className=" md:flex flex-col hidden w-[50%] p-20">
         <p className="font-bold text-lg">Book by Genre</p>
-        <div className="mb-10 flex flex-col gap-4 cursor-pointer">
-          <p>Lorem</p>
-          <p>Lorem</p>
-          <p>Lorem</p>
-          <p>Lorem</p>
-          <p>Lorem</p>
-          <p>Lorem</p>
-        </div>
+        <ul className="mb-10 flex flex-col gap-4 cursor-pointer">
+          {categories.map((cat: ICategory) => (
+            <li
+              key={cat.value}
+              onClick={() => setCategory(cat.value)}
+              className={`px-4 py-2 rounded ${
+                category === cat.value ? "bg-blue-500 text-white" : ""
+              }`}
+            >
+              {cat.label}
+            </li>
+          ))}
+        </ul>
         <div className="h-7 border-t border-gray-400 opacity-30"></div>
         <p className="font-bold">Recomendations</p>
-        <div className="flex flex-col gap-4 cursor-pointer">
-          <p>Ipsum</p>
-          <p>Ipsum</p>
-          <p>Ipsum</p>
-          <p>Ipsum</p>
-          <p>Ipsum</p>
-        </div>
+        <ul className="flex flex-col gap-4 cursor-pointer">
+          <li>Ilisum</li>
+          <li>Ilisum</li>
+          <li>Ilisum</li>
+          <li>Ilisum</li>
+          <li>Ilisum</li>
+        </ul>
       </div>
       <div className="md:hidden pt-10 relative top-5">
         <Select>

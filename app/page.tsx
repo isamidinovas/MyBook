@@ -8,19 +8,19 @@ import Header from "@/components/Header/Header";
 import { useQuery } from "@tanstack/react-query";
 import { fetchBooks } from "@/api/books";
 
-export default function Home() {
+export const Home = () => {
   const [search, setSearch] = useState("");
+  const [category, setCategory] = useState<string>("");
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ["books", search],
-    queryFn: () => fetchBooks(search),
+    queryKey: ["books", search, category],
+    queryFn: () => fetchBooks(search, category),
     enabled: !!search,
   });
   const books = data || [];
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(event.target.value);
   };
-  console.log("b:", books);
 
   if (error) {
     return <div>Error: {error.message}</div>;
@@ -42,11 +42,12 @@ export default function Home() {
         }
       ></Header>
       <div className="md:flex bg-slate-100 ">
-        <Sidebar />
-        <div className="shadow-[0_5px_30px_0_rgba(0,0,0,0.2)]  md:mt-20 mb-20 ">
+        <Sidebar category={category} setCategory={setCategory} />
+        <div className="shadow-[0_5px_30px_0_rgba(0,0,0,0.2)]  md:mt-20 mb-20 w-[100%] mr-20">
           <BookList books={books} />
         </div>
       </div>
     </div>
   );
-}
+};
+export default Home;
