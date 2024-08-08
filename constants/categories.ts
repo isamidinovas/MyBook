@@ -5,15 +5,11 @@ export type ICategory = {
 
 export const categories: ICategory[] = [
   { value: "business", label: "Business" },
-  { value: "scienes", label: "Science" },
+  { value: "cooking", label: "Cooking" },
   { value: "fiction", label: "Fiction" },
   { value: "philosophy", label: "Philosophy" },
+  { value: "science", label: "Science" },
   { value: "biography", label: "Biography" },
-];
-
-export const recomendations: ICategory[] = [
-  { value: "artist-of-the-month", label: "Artist of the Month" },
-  { value: "book-of-the-year", label: "Book of the Year" },
-  { value: "top-genre", label: "Top Genre" },
-  { value: "trending", label: "Trending" },
+  { value: "art", label: "Art" },
+  { value: "history", label: "History" },
 ];

@@ -1,4 +1,5 @@
 import { categories, ICategory } from "@/constants/categories";
+
 import {
   Select,
   SelectContent,
@@ -6,7 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../UI/select";
-import { useState } from "react";
+import { recomendations } from "@/constants/recomendations";
 
 type SideBarProp = {
   category: string;
@@ -14,8 +15,6 @@ type SideBarProp = {
 };
 
 export const Sidebar: React.FC<SideBarProp> = ({ category, setCategory }) => {
-  console.log(category);
-
   return (
     <>
       <div className=" md:flex flex-col hidden w-[50%] p-20">
@@ -36,11 +35,9 @@ export const Sidebar: React.FC<SideBarProp> = ({ category, setCategory }) => {
         <div className="h-7 border-t border-gray-400 opacity-30"></div>
         <p className="font-bold">Recomendations</p>
         <ul className="flex flex-col gap-4 cursor-pointer">
-          <li>Ilisum</li>
-          <li>Ilisum</li>
-          <li>Ilisum</li>
-          <li>Ilisum</li>
-          <li>Ilisum</li>
+          {recomendations.map((recomendation) => (
+            <li>{recomendation.label}</li>
+          ))}
         </ul>
       </div>
       <div className="md:hidden pt-10 relative top-5">
