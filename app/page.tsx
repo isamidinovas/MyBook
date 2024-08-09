@@ -53,56 +53,57 @@ export const Home = () => {
       <div className="md:flex bg-slate-100 ">
         <Sidebar category={category} setCategory={setCategory} />
         <div className="shadow-[0_5px_30px_0_rgba(0,0,0,0.2)]  md:mt-20 mb-20 w-[100%] mr-20">
-          {showSearchResults ? (
-            <section>
-              <h2 className="text-3xl font-bold ml-10 mt-10">Search Results</h2>
-              {isLoadingSearch ? (
-                <div className="flex justify-center items-center mt-10">
-                  <MagnifyingGlass
-                    visible={true}
-                    height="80"
-                    width="80"
-                    ariaLabel="magnifying-glass-loading"
-                    wrapperStyle={{}}
-                    wrapperClass="magnifying-glass-wrapper"
-                    glassColor="#c0efff"
-                    color="#e15b64"
-                  />
-                </div>
-              ) : (
-                <BookList books={searchResults} />
-              )}
-            </section>
+          {isLoadingSearch ? (
+            <div className="flex justify-center items-center mt-10 h-[100%]">
+              <MagnifyingGlass
+                visible={true}
+                height="80"
+                width="80"
+                ariaLabel="magnifying-glass-loading"
+                wrapperStyle={{}}
+                wrapperClass="magnifying-glass-wrapper"
+                glassColor="#c0efff"
+                color="#e15b64"
+              />
+            </div>
           ) : (
             <>
-              {isLoadingPopular ? (
-                <div className="flex justify-center items-center mt-10 h-[100%]">
-                  <MutatingDots
-                    visible={true}
-                    height="100"
-                    width="100"
-                    color="#4fa94d"
-                    secondaryColor="#4fa94d"
-                    radius="12.5"
-                    ariaLabel="mutating-dots-loading"
-                    wrapperStyle={{}}
-                    wrapperClass=""
-                  />
-                </div>
-              ) : (
-                <>
-                  {showPopularBooks && (
-                    <section>
-                      <h2 className="text-3xl font-bold ml-10 mt-10">
-                        Popular
-                      </h2>
-                      <BookList books={popularBooks} />
-                    </section>
-                  )}
-                </>
+              {showSearchResults && (
+                <section>
+                  <h2 className="text-3xl font-bold ml-10 mt-10">
+                    Search Results
+                  </h2>
+                  <BookList books={searchResults} />
+                </section>
               )}
             </>
           )}
+          <>
+            {isLoadingPopular ? (
+              <div className="flex justify-center items-center mt-10 h-[100%]">
+                <MutatingDots
+                  visible={true}
+                  height="100"
+                  width="100"
+                  color="#4fa94d"
+                  secondaryColor="#4fa94d"
+                  radius="12.5"
+                  ariaLabel="mutating-dots-loading"
+                  wrapperStyle={{}}
+                  wrapperClass=""
+                />
+              </div>
+            ) : (
+              <>
+                {showPopularBooks && (
+                  <section>
+                    <h2 className="text-3xl font-bold ml-10 mt-10">Popular</h2>
+                    <BookList books={popularBooks} />
+                  </section>
+                )}
+              </>
+            )}
+          </>
         </div>
       </div>
     </div>
