@@ -7,7 +7,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../UI/select";
-import { recomendations } from "@/constants/recomendations";
 
 type SideBarProp = {
   category: string;
@@ -18,7 +17,7 @@ export const Sidebar: React.FC<SideBarProp> = ({ category, setCategory }) => {
   return (
     <>
       <div className=" md:flex flex-col hidden w-[50%] p-20">
-        <p className="font-bold text-lg">Book by Genre</p>
+        <p className="font-bold text-xl mb-7">Book by Category</p>
         <ul className="mb-10 flex flex-col gap-4 cursor-pointer">
           {categories.map((cat: ICategory) => (
             <li
@@ -33,12 +32,6 @@ export const Sidebar: React.FC<SideBarProp> = ({ category, setCategory }) => {
           ))}
         </ul>
         <div className="h-7 border-t border-gray-400 opacity-30"></div>
-        <p className="font-bold">Recomendations</p>
-        <ul className="flex flex-col gap-4 cursor-pointer">
-          {recomendations.map((recomendation) => (
-            <li>{recomendation.label}</li>
-          ))}
-        </ul>
       </div>
       <div className="md:hidden pt-10 relative top-5">
         <Select>

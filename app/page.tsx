@@ -1,10 +1,9 @@
 "use client";
 import BookList from "@/components/BooksList/BooksList";
-import { JSX, useState } from "react";
-
-import HeroImg from "../assets/Image Hero.svg";
+import { useState } from "react";
 import { MagnifyingGlass, MutatingDots } from "react-loader-spinner";
 
+import HeroImg from "../assets/Image Hero.svg";
 import Sidebar from "@/components/SideBar/SideBar";
 import { Input } from "@/components/UI/input";
 import Header from "@/components/Header/Header";
@@ -13,7 +12,7 @@ import usePopularBooks from "@/hooks/usePopularBooks";
 
 export const Home = () => {
   const [search, setSearch] = useState("");
-  const [category, setCategory] = useState<string>("");
+  const [category, setCategory] = useState("");
 
   const {
     data: searchResults = [],
@@ -33,7 +32,12 @@ export const Home = () => {
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(event.target.value);
   };
-
+  if (errorPopular) {
+    return <p>Error fetching popular books: {errorPopular.message}</p>;
+  }
+  if (errorSearch) {
+    return <p>Error fetching popular books: {errorSearch.message}</p>;
+  }
   return (
     <div className="">
       <Header
@@ -55,16 +59,7 @@ export const Home = () => {
         <div className="shadow-[0_5px_30px_0_rgba(0,0,0,0.2)]  md:mt-20 mb-20 w-[100%] mr-20">
           {isLoadingSearch ? (
             <div className="flex justify-center items-center mt-10 h-[100%]">
-              <MagnifyingGlass
-                visible={true}
-                height="80"
-                width="80"
-                ariaLabel="magnifying-glass-loading"
-                wrapperStyle={{}}
-                wrapperClass="magnifying-glass-wrapper"
-                glassColor="#c0efff"
-                color="#e15b64"
-              />
+              <MagnifyingGlass />
             </div>
           ) : (
             <>
@@ -81,17 +76,7 @@ export const Home = () => {
           <>
             {isLoadingPopular ? (
               <div className="flex justify-center items-center mt-10 h-[100%]">
-                <MutatingDots
-                  visible={true}
-                  height="100"
-                  width="100"
-                  color="#4fa94d"
-                  secondaryColor="#4fa94d"
-                  radius="12.5"
-                  ariaLabel="mutating-dots-loading"
-                  wrapperStyle={{}}
-                  wrapperClass=""
-                />
+                <MutatingDots />
               </div>
             ) : (
               <>
