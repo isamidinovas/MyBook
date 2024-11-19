@@ -3,6 +3,10 @@ export type IBook = {
   volumeInfo: {
     title: string;
     authors: string[] | string;
+    averageRating: number;
+    ratingsCount: number;
+    publisher: string;
+    publishedDate: string;
     imageLinks: {
       smallThumbnail: string;
       thumbnail: string;
