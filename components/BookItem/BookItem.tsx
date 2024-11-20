@@ -26,7 +26,7 @@ export const BookItem: React.FC<BookItemProp> = ({ book, isShopPage }) => {
 
   return (
     <div
-      className={`group relative md:flex gap-7 items-start xl:w-[45%] min-h-[250px] p-4 transition-transform duration-300 ease-in-out  ${
+      className={`group relative flex md:flex-row flex-col  gap-7 items-center md:w-[45%] w-[100%] min-h-[250px] p-4 transition-transform duration-300 ease-in-out  ${
         isShopPage
           ? "bg-white rounded-lg shadow-lg hover:shadow-2xl hover:scale-105"
           : "hover:scale-105"
@@ -41,7 +41,7 @@ export const BookItem: React.FC<BookItemProp> = ({ book, isShopPage }) => {
               alt="Book cover"
               width={140}
               height={220}
-              className="object-cover"
+              className="object-cover "
             />
           </Link>
         ) : (
@@ -50,7 +50,7 @@ export const BookItem: React.FC<BookItemProp> = ({ book, isShopPage }) => {
       </div>
 
       {/* Text Section */}
-      <div className="flex flex-col justify-between flex-grow gap-3 w-full">
+      <div className="flex flex-col md:justify-between md:items-start items-center flex-grow gap-3 w-full">
         <p className={`md:text-2xl font-bold ${rubik.className}`}>
           {truncatedTitle + "..."}
         </p>

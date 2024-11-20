@@ -5,7 +5,7 @@ const usePopularBooks = (category: string) => {
   return useQuery({
     queryKey: ["popularBooks", category],
     queryFn: () => fetchPopularBooks(category),
-
+    refetchOnWindowFocus: false,
     enabled: true,
   });
 };

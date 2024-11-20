@@ -33,7 +33,7 @@ export const Sidebar: React.FC<SideBarProp> = ({ category, setCategory }) => {
         </ul>
         <div className="h-7 border-t border-gray-400 opacity-30"></div>
       </div>
-      <div className="md:hidden pt-10 relative top-5">
+      {/* <div className="md:hidden pt-10 relative top-5">
         <Select>
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="Theme" />
@@ -44,7 +44,7 @@ export const Sidebar: React.FC<SideBarProp> = ({ category, setCategory }) => {
             <SelectItem value="system">System</SelectItem>
           </SelectContent>
         </Select>
-      </div>
+      </div> */}
     </>
   );
 };

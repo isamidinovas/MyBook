@@ -30,7 +30,7 @@ export const BookList: React.FC<BookListProp> = ({
   return (
     <div className="flex flex-wrap gap-20 justify-between h-auto  p-10 ">
       {title && <h2 className="text-2xl font-bold mb-4">{title}</h2>}
-      <div className="flex flex-wrap gap-20 justify-between h-auto">
+      <div className="flex flex-wrap md:gap-20  gap-10 justify-between h-auto">
         {books.length > 0 ? (
           books.map((book: IBook) => (
             <BookItem key={book.id} book={book} isShopPage={isShopPage} />

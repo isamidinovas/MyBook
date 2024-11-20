@@ -5,6 +5,7 @@ const useSearchBooks = (search: string, category: string) => {
   return useQuery({
     queryKey: ["books", search, category],
     queryFn: () => fetchBooks(search, category),
+    refetchOnWindowFocus: false,
     enabled: !!search,
   });
 };
