@@ -34,16 +34,19 @@ export const NavBar = () => {
         </div>
         <ul className="gap-20 font-medium items-center lg:flex hidden text-white">
           <li>
-            <Link href="/">Explorer</Link>
+            <Link href="/">Каталог</Link>
           </li>
           <li>
-            <Link href="/shop">Shop</Link>
+            <Link href="/contacts">Контакты</Link>
           </li>
           <li>
-            <Link href="/blog">Blog</Link>
+            <Link href="/about">О нас</Link>
           </li>
           <li>
-            <Link href="/login">
+            <Link href="/cart">Корзина</Link>
+          </li>
+          <li>
+            <Link href="/auth">
               <Button size="lg" borderRadius="xl" textColor="white">
                 Log in
               </Button>
@@ -62,7 +65,7 @@ export const NavBar = () => {
                 <Link href="/">Explorer</Link>
               </DropdownMenuRadioItem>
               <DropdownMenuRadioItem value="bottom">
-                <Link href="/shop">Shop</Link>
+                <Link href="/shop">Контакты</Link>
               </DropdownMenuRadioItem>
               <DropdownMenuRadioItem value="right">
                 <Link href="/blog">Blog</Link>

@@ -1,17 +1,15 @@
 export type IBook = {
   id: string;
-  volumeInfo: {
-    title: string;
-    authors: string[] | string;
-    averageRating: number;
-    ratingsCount: number;
-    publisher: string;
-    publishedDate: string;
-    imageLinks: {
-      smallThumbnail: string;
-      thumbnail: string;
-    };
-    description: string;
-    categories: string;
-  };
+  googleBookId: string;
+  title: string;
+  authors: string[];
+  description: string;
+  thumbnail: string | null;
+  categories: string[];
+  publisher: string | null;
+  publishedDate: string;
+  pageCount: number | null;
+  language: string | null;
+  createdAt: Date;
+  updatedAt: Date;
 };

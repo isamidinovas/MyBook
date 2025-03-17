@@ -36,7 +36,8 @@ const buttonVariants = cva(
         yellow: "text-yellow",
       },
       borderColor: {
-        yellow: "border-yellow",
+        // yellow: "border-yellow",
+        black: "border-black",
       },
       backgroundColor: {
         amber: "bg-amber",
@@ -80,7 +81,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
             borderRadius,
             borderColor,
             backgroundColor,
-            textColor,
+            // textColor,
             className,
           })
         )}

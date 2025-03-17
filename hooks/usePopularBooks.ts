@@ -1,12 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { fetchPopularBooks } from "@/api/fetchPopularBooks";
 
-const usePopularBooks = (category: string) => {
+const usePopularBooks = (category?: string) => {
   return useQuery({
-    queryKey: ["popularBooks", category],
+    queryKey: ["books", category],
     queryFn: () => fetchPopularBooks(category),
     refetchOnWindowFocus: false,
-    enabled: true,
   });
 };
 

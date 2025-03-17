@@ -1,4 +1,4 @@
-import { IBook } from "@/types/book-item";
+import { IBook } from "@/types/book";
 import Image from "next/image";
 import { Rubik } from "next/font/google";
 import { Button } from "../UI/Button/button";
@@ -15,65 +15,77 @@ type BookItemProp = {
 };
 
 export const BookItem: React.FC<BookItemProp> = ({ book, isShopPage }) => {
-  const { authors, description, imageLinks, title } = book.volumeInfo;
+  // Проверяем наличие необходимых данных
+  if (!book || !book.title) {
+    console.error("BookItem received invalid book data:", book);
+    return null;
+  }
 
-  const maxLength = 80;
-  const truncatedText =
-    description?.length > maxLength
-      ? description.slice(0, maxLength)
-      : description;
-  const truncatedTitle = title?.length > 20 ? title.slice(0, 25) : title;
+  const truncatedTitle =
+    book.title.length > 25 ? book.title.slice(0, 25) + "..." : book.title;
 
   return (
     <div
-      className={`group relative flex md:flex-row flex-col  gap-7 items-center md:w-[45%] w-[100%] min-h-[250px] p-4 transition-transform duration-300 ease-in-out  ${
+      className={`group relative flex md:flex-row flex-col gap-7 items-center md:w-[100%] w-[100%] min-h-[250px] p-4 transition-transform duration-300 ease-in-out ${
         isShopPage
           ? "bg-white rounded-lg shadow-lg hover:shadow-2xl hover:scale-105"
           : "hover:scale-105"
       }`}
     >
       {/* Image Section */}
-      <div className="w-[140px] h-[220px] flex-shrink-0 flex items-center justify-center overflow-hidden bg-gray-200">
-        {imageLinks ? (
+      <div className="w-[140px] h-[220px] flex-shrink-0 flex items-center justify-center overflow-hidden">
+        {book.thumbnail ? (
           <Link href={`/${book.id}`}>
             <Image
-              src={imageLinks?.thumbnail}
-              alt="Book cover"
+              src={book.thumbnail}
+              alt={book.title}
               width={140}
               height={220}
-              className="object-cover "
+              className="object-cover"
             />
           </Link>
         ) : (
-          <div className="text-center text-sm text-gray-500">No Image</div>
+          <div className="text-center text-sm text-gray-500">
+            Нет изображения
+          </div>
         )}
       </div>
 
       {/* Text Section */}
       <div className="flex flex-col md:justify-between md:items-start items-center flex-grow gap-3 w-full">
         <p className={`md:text-2xl font-bold ${rubik.className}`}>
-          {truncatedTitle + "..."}
+          {truncatedTitle}
         </p>
         <p className="text-sm text-gray-600">
-          {Array.isArray(authors) ? authors.join(", ") : authors}
+          {Array.isArray(book.authors) && book.authors.length > 0
+            ? book.authors.join(", ")
+            : "Автор не указан"}
         </p>
         <span className="text-xs text-gray-500">
-          {book.volumeInfo.categories}
+          {Array.isArray(book.categories) && book.categories.length > 0
+            ? book.categories.join(", ")
+            : "Категория не указана"}
         </span>
-        <p className="opacity-50 break-words text-sm">
-          {truncatedText + "..."}
-        </p>
-        {isShopPage && (
+        <div className="flex justify-between gap-2">
           <Button
             variant="outline"
-            size="lg"
+            size="sm"
             textColor="yellow"
             backgroundColor="amber"
-            borderColor="yellow"
+            borderColor="black"
           >
-            Buy Now
+            Купить
           </Button>
-        )}
+          <Button
+            variant="outline"
+            size="sm"
+            textColor="yellow"
+            backgroundColor="amber"
+            borderColor="black"
+          >
+            В корзину
+          </Button>
+        </div>
       </div>
     </div>
   );
