@@ -24,6 +24,7 @@
     "classnames": "^2.5.1",
     "clsx": "^2.1.1",
     "firebase": "^11.2.0",
+    "googleapis": "^146.0.0",
     "lucide-react": "^0.408.0",
     "next": "14.2.5",
     "node-cron": "^3.0.3",
