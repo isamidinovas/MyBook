@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { Button } from "../UI/Button/button";
-import { removeFromCart } from "@/api/cartApi";
+import { removeFromCart, addToCart, getCart } from "@/api/cartApi";
 import { toast } from "react-hot-toast";
 
 interface CartItemProps {
@@ -25,6 +25,9 @@ const CartItem = ({ item, onUpdate, updateQuantity }: CartItemProps) => {
   const [isUpdating, setIsUpdating] = useState(false);
   const [quantity, setQuantity] = useState(item.quantity);
   const [isRemoved, setIsRemoved] = useState(false);
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const [isInCart, setIsInCart] = useState(false);
+  const [cartItemId, setCartItemId] = useState("");
 
   // Используем фиксированную цену, так как у нас нет реальных цен для книг
   const price = 499; // фиксированная цена в рублях

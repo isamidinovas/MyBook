@@ -6,11 +6,17 @@ import { Button } from "@/components/UI/Button/button";
 import useBook from "@/hooks/useBook";
 import { useParams, useRouter } from "next/navigation";
 import { MutatingDots } from "react-loader-spinner";
+import { useState, useEffect } from "react";
+import { toast } from "react-hot-toast";
+import { addToCart, getCart, removeFromCart } from "@/api/cartApi";
 
 export const PageDetail = () => {
   const params = useParams();
   const router = useRouter();
   const { bookId } = params;
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const [isInCart, setIsInCart] = useState(false);
+  const [cartItemId, setCartItemId] = useState("");
 
   console.log("Current bookId:", bookId);
 
@@ -20,8 +26,105 @@ export const PageDetail = () => {
     error: errorSearch,
   } = useBook(bookId as string);
 
+  // Проверяем, есть ли книга уже в корзине при загрузке страницы
+  useEffect(() => {
+    const checkIfInCart = async () => {
+      try {
+        const cart = await getCart();
+
+        if (cart && cart.items && Array.isArray(cart.items)) {
+          const cartItem = cart.items.find(
+            (item: {
+              book: { id: string | string[]; googleBookId: string | string[] };
+            }) =>
+              item.book &&
+              (item.book.id === bookId || item.book.googleBookId === bookId)
+          );
+
+          if (cartItem) {
+            setIsInCart(true);
+            setCartItemId(cartItem.id);
+            console.log("Книга уже в корзине, ID элемента:", cartItem.id);
+          } else {
+            setIsInCart(false);
+            setCartItemId("");
+          }
+        }
+      } catch (error) {
+        console.error("Ошибка при проверке корзины:", error);
+      }
+    };
+
+    if (bookId) {
+      checkIfInCart();
+    }
+
+    // Также слушаем событие обновления корзины
+    const handleCartUpdate = () => {
+      checkIfInCart();
+    };
+
+    window.addEventListener("cartUpdated", handleCartUpdate);
+
+    return () => {
+      window.removeEventListener("cartUpdated", handleCartUpdate);
+    };
+  }, [bookId]);
+
   const handleBack = () => {
     router.back();
+  };
+
+  const handleToggleCart = async () => {
+    try {
+      setIsAddingToCart(true);
+
+      if (isInCart) {
+        // Если книга уже в корзине, удаляем её
+        await removeFromCart(cartItemId);
+        setIsInCart(false);
+        setCartItemId("");
+        toast.success("Книга удалена из корзины");
+      } else {
+        // Если книги нет в корзине, добавляем её
+        const result = await addToCart(bookId as string, 1);
+
+        if (result && result.id) {
+          setIsInCart(true);
+          setCartItemId(result.id);
+        }
+
+        toast.success("Книга добавлена в корзину");
+      }
+    } catch (error) {
+      console.error("Error toggling cart:", error);
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Не удалось выполнить операцию с корзиной"
+      );
+    } finally {
+      setIsAddingToCart(false);
+    }
+  };
+
+  const handleBuyNow = async () => {
+    try {
+      setIsAddingToCart(true);
+
+      if (!isInCart) {
+        // Только если книги еще нет в корзине, добавляем её
+        await addToCart(bookId as string, 1);
+      }
+
+      // Перенаправляем на страницу корзины
+      router.push("/cart");
+    } catch (error) {
+      console.error("Error adding to cart:", error);
+      toast.error("Не удалось добавить книгу в корзину");
+    } finally {
+      setIsAddingToCart(false);
+    }
   };
 
   if (isLoadingSearch) {
@@ -58,7 +161,9 @@ export const PageDetail = () => {
           textColor="yellow"
           backgroundColor="amber"
           borderColor="black"
-        />
+        >
+          Вернуться назад
+        </Button>
       </div>
     );
   }
@@ -77,7 +182,9 @@ export const PageDetail = () => {
           textColor="yellow"
           backgroundColor="amber"
           borderColor="black"
-        />
+        >
+          Вернуться назад
+        </Button>
       </div>
     );
   }
@@ -104,11 +211,12 @@ export const PageDetail = () => {
       <div className="container mx-auto px-4 py-8">
         <Button
           onClick={handleBack}
-          // variant="outline"
-          // textColor="yellow"
-          // backgroundColor="amber"
+          variant="outline"
+          size="lg"
+          textColor="yellow"
+          backgroundColor="amber"
           borderColor="black"
-          className=" bg-black rounded-full"
+          className="mb-8"
         >
           <Image
             src={ArrowButton}
@@ -117,6 +225,7 @@ export const PageDetail = () => {
             height={24}
             className="mr-2"
           />
+          Вернуться назад
         </Button>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -145,7 +254,10 @@ export const PageDetail = () => {
 
             {volumeInfo.price && (
               <div className="text-2xl font-bold text-green-600">
-                {volumeInfo.price.toLocaleString("kg-KG")} сом
+                {typeof volumeInfo.price === "number"
+                  ? volumeInfo.price.toLocaleString("ru-RU")
+                  : volumeInfo.price}{" "}
+                ₽
               </div>
             )}
 
@@ -189,24 +301,34 @@ export const PageDetail = () => {
 
             <div className="flex gap-4">
               <Button
-                variant="outline"
+                onClick={handleToggleCart}
+                variant={isInCart ? "secondary" : "outline"}
                 size="lg"
-                textColor="yellow"
+                textColor={isInCart ? "white" : "yellow"}
                 backgroundColor="amber"
                 borderColor="black"
-                className="flex-1"
+                className={`flex-1 ${
+                  isInCart ? "bg-green-600 text-white hover:bg-green-700" : ""
+                }`}
+                disabled={isAddingToCart}
               >
-                В корзину
+                {isAddingToCart
+                  ? "Обработка..."
+                  : isInCart
+                  ? "В корзине ✓"
+                  : "В корзину"}
               </Button>
               <Button
+                onClick={handleBuyNow}
                 variant="outline"
                 size="lg"
                 textColor="yellow"
                 backgroundColor="amber"
                 borderColor="black"
                 className="flex-1"
+                disabled={isAddingToCart}
               >
-                Купить сейчас
+                {isAddingToCart ? "Обработка..." : "Купить сейчас"}
               </Button>
             </div>
           </div>

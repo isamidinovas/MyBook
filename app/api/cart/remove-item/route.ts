@@ -15,9 +15,22 @@ function getCompatibleObjectId(input: string): string {
   return hash.substring(0, 24);
 }
 
-export async function PUT(request: Request) {
+export async function DELETE(request: Request) {
   try {
-    console.log("Запрос на обновление количества товара в корзине");
+    console.log("Запрос на удаление элемента корзины");
+
+    // Получаем ID из тела запроса
+    const body = await request.json();
+    const { cartItemId } = body;
+
+    console.log("Полученный ID элемента корзины:", cartItemId);
+
+    if (!cartItemId) {
+      return NextResponse.json(
+        { error: "ID элемента корзины не указан" },
+        { status: 400 }
+      );
+    }
 
     const sessionCookie = cookies().get("session");
     if (!sessionCookie) {
@@ -47,31 +60,10 @@ export async function PUT(request: Request) {
     const compatibleUserId = getCompatibleObjectId(userId);
 
     console.log(
-      `Обновление количества товара для пользователя: ${userId} -> ${compatibleUserId}`
+      `Удаление элемента корзины для пользователя: ${userId} -> ${compatibleUserId}`
     );
 
-    let body;
-    try {
-      body = await request.json();
-    } catch (error) {
-      console.error("Ошибка при парсинге тела запроса:", error);
-      return NextResponse.json(
-        { error: "Некорректный формат запроса" },
-        { status: 400 }
-      );
-    }
-
-    const { cartItemId, quantity } = body;
-
-    // Проверка входных данных
-    if (!cartItemId || !quantity || quantity < 1) {
-      return NextResponse.json(
-        { error: "Необходимо указать cartItemId и количество больше 0" },
-        { status: 400 }
-      );
-    }
-
-    // Находим элемент корзины и убеждаемся, что он принадлежит корзине этого пользователя
+    // Находим элемент корзины и проверяем, принадлежит ли он корзине пользователя
     const cartItem = await db.cartItem.findUnique({
       where: { id: cartItemId },
       include: { cart: true },
@@ -92,15 +84,9 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: "Доступ запрещен" }, { status: 403 });
     }
 
-    // Обновляем количество
-    console.log(
-      `Обновление количества для элемента ${cartItemId}: ${cartItem.quantity} -> ${quantity}`
-    );
-
-    const updatedCartItem = await db.cartItem.update({
+    // Удаляем элемент из базы данных
+    await db.cartItem.delete({
       where: { id: cartItemId },
-      data: { quantity },
-      include: { book: true },
     });
 
     // Получаем обновленную корзину для ответа
@@ -117,14 +103,13 @@ export async function PUT(request: Request) {
 
     return NextResponse.json({
       success: true,
-      cartItem: updatedCartItem,
       cart: updatedCart,
     });
   } catch (error) {
-    console.error("Ошибка при обновлении количества товара:", error);
+    console.error("Error removing from cart:", error);
     return NextResponse.json(
       {
-        error: `Ошибка сервера при обновлении количества товара: ${
+        error: `Ошибка при удалении из корзины: ${
           error instanceof Error ? error.message : String(error)
         }`,
       },

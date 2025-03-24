@@ -5,79 +5,137 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { toast } from "react-hot-toast";
+import { getCart, removeFromCart, updateCartItemQuantity } from "@/api/cartApi";
 
-// Тип для книги в корзине
-interface CartBook {
+// Тип для элемента корзины в соответствии с API
+interface CartItem {
   id: string;
-  title: string;
-  author: string;
-  price: number;
-  coverImage: string;
   quantity: number;
+  book: {
+    id: string;
+    title: string;
+    authors: string[];
+    thumbnail: string | null;
+    description: string;
+    price?: number;
+  };
+}
+
+// Тип для корзины
+interface Cart {
+  id?: string;
+  userId?: string;
+  items: CartItem[];
 }
 
 const CartPage = () => {
-  const [cartItems, setCartItems] = useState<CartBook[]>([]);
+  const [cart, setCart] = useState<Cart>({ items: [] });
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
-  // Загрузка корзины из localStorage при монтировании компонента
+  // Загрузка корзины из API при монтировании компонента
   useEffect(() => {
-    const loadCart = () => {
+    const loadCart = async () => {
       try {
-        const savedCart = localStorage.getItem("bookCart");
-        if (savedCart) {
-          setCartItems(JSON.parse(savedCart));
-        }
+        setIsLoading(true);
+        const cartData = await getCart();
+        console.log("Полученные данные корзины:", cartData);
+        setCart(cartData);
       } catch (error) {
-        console.error("Error loading cart from localStorage:", error);
+        console.error("Error loading cart:", error);
+        toast.error("Не удалось загрузить корзину");
       } finally {
         setIsLoading(false);
       }
     };
 
     loadCart();
+
+    // Слушаем события обновления корзины
+    const handleCartUpdate = () => {
+      loadCart();
+    };
+
+    window.addEventListener("cartUpdated", handleCartUpdate);
+    return () => {
+      window.removeEventListener("cartUpdated", handleCartUpdate);
+    };
   }, []);
 
-  // Обновление localStorage при изменении корзины
-  useEffect(() => {
-    if (!isLoading) {
-      localStorage.setItem("bookCart", JSON.stringify(cartItems));
-    }
-  }, [cartItems, isLoading]);
-
   // Расчет итоговой стоимости
-  const totalPrice = cartItems.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
-  );
+  const totalPrice = cart.items.reduce((sum, item) => {
+    const price = item.book.price || 0;
+    return sum + price * item.quantity;
+  }, 0);
 
   // Удаление товара из корзины
-  const removeFromCart = (id: string) => {
-    setCartItems(cartItems.filter((item) => item.id !== id));
+  const handleRemoveFromCart = async (id: string) => {
+    try {
+      await removeFromCart(id);
+      // Обновляем состояние корзины после удаления
+      setCart((prevCart) => ({
+        ...prevCart,
+        items: prevCart.items.filter((item) => item.id !== id),
+      }));
+      toast.success("Товар удален из корзины");
+
+      // Оповещаем о изменении корзины
+      window.dispatchEvent(new CustomEvent("cartUpdated"));
+    } catch (error) {
+      console.error("Error removing from cart:", error);
+      toast.error("Не удалось удалить товар из корзины");
+    }
   };
 
   // Изменение количества товара
-  const updateQuantity = (id: string, newQuantity: number) => {
+  const handleUpdateQuantity = async (id: string, newQuantity: number) => {
     if (newQuantity < 1) return;
 
-    setCartItems(
-      cartItems.map((item) =>
-        item.id === id ? { ...item, quantity: newQuantity } : item
-      )
-    );
+    try {
+      await updateCartItemQuantity(id, newQuantity);
+
+      // Обновляем состояние корзины
+      setCart((prevCart) => ({
+        ...prevCart,
+        items: prevCart.items.map((item) =>
+          item.id === id ? { ...item, quantity: newQuantity } : item
+        ),
+      }));
+
+      // Оповещаем о изменении корзины
+      window.dispatchEvent(new CustomEvent("cartUpdated"));
+    } catch (error) {
+      console.error("Error updating quantity:", error);
+      toast.error("Не удалось обновить количество");
+    }
   };
 
   // Оформление заказа
   const handleCheckout = () => {
-    if (cartItems.length === 0) {
-      alert("Ваша корзина пуста");
+    if (cart.items.length === 0) {
+      toast.error("Ваша корзина пуста");
       return;
     }
 
     // В реальном приложении здесь был бы редирект на страницу оформления заказа
-    alert("Переход к оформлению заказа");
+    toast.success("Переход к оформлению заказа");
     router.push("/checkout");
+  };
+
+  // Очистка корзины
+  const clearCart = async () => {
+    try {
+      // Удаляем все элементы корзины
+      for (const item of cart.items) {
+        await removeFromCart(item.id);
+      }
+      setCart({ items: [] });
+      toast.success("Корзина очищена");
+    } catch (error) {
+      console.error("Error clearing cart:", error);
+      toast.error("Не удалось очистить корзину");
+    }
   };
 
   if (isLoading) {
@@ -92,7 +150,7 @@ const CartPage = () => {
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6">Корзина</h1>
 
-      {cartItems.length === 0 ? (
+      {!cart.items || cart.items.length === 0 ? (
         <div className="text-center py-12">
           <h2 className="text-xl mb-4">Ваша корзина пуста</h2>
           <p className="mb-6">
@@ -114,31 +172,43 @@ const CartPage = () => {
                 <div className="col-span-6">Книга</div>
                 <div className="col-span-2 text-center">Цена</div>
                 <div className="col-span-2 text-center">Количество</div>
-                <div className="col-span-2 text-center">Сумма</div>
+                <div className="col-span-1 text-center">Сумма</div>
               </div>
 
-              {cartItems.map((book) => (
+              {cart.items.map((item) => (
                 <div
-                  key={book.id}
+                  key={item.id}
                   className="border-b border-gray-200 last:border-0"
                 >
                   <div className="grid grid-cols-1 md:grid-cols-12 p-4 gap-4 items-center">
                     {/* Информация о книге */}
                     <div className="md:col-span-6 flex items-center gap-4">
                       <div className="w-16 h-24 relative flex-shrink-0 bg-gray-100">
-                        <Image
-                          src={book.coverImage}
-                          alt={book.title}
-                          className="object-cover"
-                          fill
-                          sizes="100%"
-                        />
+                        {item.book.thumbnail ? (
+                          <Image
+                            src={item.book.thumbnail}
+                            alt={item.book.title}
+                            className="object-cover"
+                            fill
+                            sizes="100%"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center bg-gray-200">
+                            <span className="text-gray-500 text-xs text-center">
+                              Нет изображения
+                            </span>
+                          </div>
+                        )}
                       </div>
                       <div>
-                        <h3 className="font-medium">{book.title}</h3>
-                        <p className="text-sm text-gray-600">{book.author}</p>
+                        <h3 className="font-medium">{item.book.title}</h3>
+                        <p className="text-sm text-gray-600">
+                          {Array.isArray(item.book.authors)
+                            ? item.book.authors.join(", ")
+                            : "Автор не указан"}
+                        </p>
                         <button
-                          onClick={() => removeFromCart(book.id)}
+                          onClick={() => handleRemoveFromCart(item.id)}
                           className="text-sm text-red-600 hover:underline mt-2 md:hidden"
                         >
                           Удалить
@@ -149,7 +219,13 @@ const CartPage = () => {
                     {/* Цена */}
                     <div className="md:col-span-2 text-center">
                       <span className="md:hidden font-medium">Цена: </span>
-                      {book.price.toLocaleString()} ₽
+                      {item.book.price
+                        ? `${
+                            typeof item.book.price === "number"
+                              ? item.book.price.toLocaleString("ru-RU")
+                              : item.book.price
+                          } ₽`
+                        : "Цена не указана"}
                     </div>
 
                     {/* Количество */}
@@ -157,18 +233,18 @@ const CartPage = () => {
                       <div className="flex items-center border rounded-md">
                         <button
                           onClick={() =>
-                            updateQuantity(book.id, book.quantity - 1)
+                            handleUpdateQuantity(item.id, item.quantity - 1)
                           }
                           className="w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-gray-100"
                         >
                           -
                         </button>
                         <span className="w-10 text-center">
-                          {book.quantity}
+                          {item.quantity}
                         </span>
                         <button
                           onClick={() =>
-                            updateQuantity(book.id, book.quantity + 1)
+                            handleUpdateQuantity(item.id, item.quantity + 1)
                           }
                           className="w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-gray-100"
                         >
@@ -178,15 +254,19 @@ const CartPage = () => {
                     </div>
 
                     {/* Сумма */}
-                    <div className="md:col-span-2 text-center font-medium">
+                    <div className="md:col-span-1 text-center font-medium">
                       <span className="md:hidden font-medium">Сумма: </span>
-                      {(book.price * book.quantity).toLocaleString()} ₽
+                      {item.book.price
+                        ? `${(
+                            item.book.price * item.quantity || 0
+                          ).toLocaleString("ru-RU")} ₽`
+                        : "Сумма не указана"}
                     </div>
 
                     {/* Кнопка Удалить (десктоп) */}
                     <button
-                      onClick={() => removeFromCart(book.id)}
-                      className="hidden md:block absolute right-4 text-gray-400 hover:text-red-600"
+                      onClick={() => handleRemoveFromCart(item.id)}
+                      className="hidden md:block md:col-span-1 text-gray-400 hover:text-red-600 ml-9 "
                       aria-label="Удалить товар"
                     >
                       <svg
@@ -209,7 +289,7 @@ const CartPage = () => {
 
             <div className="mt-6 flex justify-between">
               <Link
-                href="/catalog"
+                href="/"
                 className="text-blue-600 hover:underline flex items-center"
               >
                 <svg
@@ -227,7 +307,7 @@ const CartPage = () => {
                 Продолжить покупки
               </Link>
               <button
-                onClick={() => setCartItems([])}
+                onClick={clearCart}
                 className="text-gray-600 hover:text-red-600"
               >
                 Очистить корзину
@@ -244,10 +324,10 @@ const CartPage = () => {
                 <div className="flex justify-between">
                   <span>
                     Товары (
-                    {cartItems.reduce((sum, item) => sum + item.quantity, 0)}{" "}
+                    {cart.items.reduce((sum, item) => sum + item.quantity, 0)}{" "}
                     шт.)
                   </span>
-                  <span>{totalPrice.toLocaleString()} ₽</span>
+                  <span>{totalPrice.toLocaleString("ru-RU")} ₽</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Доставка</span>
@@ -255,7 +335,7 @@ const CartPage = () => {
                 </div>
                 <div className="border-t pt-3 mt-3 border-gray-200 flex justify-between font-bold text-lg">
                   <span>Итого:</span>
-                  <span>{totalPrice.toLocaleString()} ₽</span>
+                  <span>{totalPrice.toLocaleString("ru-RU")} ₽</span>
                 </div>
               </div>
 
